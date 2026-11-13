@@ -4,6 +4,7 @@ import { MAX_PROMPT_LENGTH, validatePromptLength } from '../utils/validatePrompt
 interface PromptInputProps {
   onGenerate: (prompt: string) => void;
   isLoading: boolean;
+  history?: string[];
 }
 
 const EXAMPLES = [
@@ -18,7 +19,7 @@ const EXAMPLES = [
 const EXAMPLE_LABELS = ['KPI 대시보드', '알림 설정', '검색 필터', '온보딩 체크리스트', '요금제 비교', '고객 상세 패널'];
 const EXAMPLE_ICONS = ['▥', '☷', '⌕', '☑', '▤', '▣'];
 
-export function PromptInput({ onGenerate, isLoading }: PromptInputProps) {
+export function PromptInput({ onGenerate, isLoading, history = [] }: PromptInputProps) {
   const [prompt, setPrompt] = useState('');
   const feedbackId = useId();
   const isLengthValid = validatePromptLength(prompt);
@@ -81,6 +82,16 @@ export function PromptInput({ onGenerate, isLoading }: PromptInputProps) {
         </button>
         </div>
       </form>
+      {history.length > 0 && (
+        <div className="prompt-examples" aria-label="프롬프트 히스토리">
+          <span className="examples-label">최근 프롬프트</span>
+          {history.map((item) => (
+            <button key={item} className="example-chip" type="button" onClick={() => setPrompt(item)}>
+              {item}
+            </button>
+          ))}
+        </div>
+      )}
       <div className="prompt-examples">
         <span className="examples-label">시작이 어렵다면, 여기서 골라보세요</span>
         {EXAMPLES.map((example, index) => (
