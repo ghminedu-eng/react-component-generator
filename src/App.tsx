@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { PromptInput } from './components/PromptInput';
 import { ComponentCard } from './components/ComponentCard';
 import { useComponentGenerator } from './hooks/useComponentGenerator';
+import { useStoredState } from './hooks/useStoredState';
 import type { Provider } from './types';
 import './App.css';
 
@@ -11,14 +12,16 @@ const PROVIDER_CONFIG = {
 } as const;
 
 function App() {
-  const [apiKey, setApiKey] = useState('');
+  const [apiKey, setApiKey] = useStoredState('component-studio.api-key', '',
+    (value) => typeof value === 'string' ? value : '');
   const [showKey, setShowKey] = useState(false);
-  const [provider, setProvider] = useState<Provider>('google');
+  const [provider, setProvider] = useStoredState<Provider>('component-studio.provider', 'google',
+    (value) => value === 'anthropic' ? 'anthropic' : 'google');
   const [envKeys, setEnvKeys] = useState<Record<Provider, boolean>>({
     anthropic: false,
     google: false,
   });
-  const { components, isLoading, error, generate, removeComponent, clearAll } =
+  const { components, promptHistory, isLoading, error, generate, removeComponent, clearAll } =
     useComponentGenerator();
 
   useEffect(() => {
@@ -73,7 +76,7 @@ function App() {
       <main className="workspace">
         <section className="composer-panel" aria-label="컴포넌트 생성">
           <div className="window-bar"><span className="window-symbol" aria-hidden="true" />새 컴포넌트</div>
-          <PromptInput onGenerate={handleGenerate} isLoading={isLoading} />
+          <PromptInput onGenerate={handleGenerate} isLoading={isLoading} history={promptHistory} />
         </section>
 
         <aside className="settings-panel" aria-label="실행 설정">
